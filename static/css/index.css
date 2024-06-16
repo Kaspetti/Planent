@@ -1,5 +1,6 @@
 body {
   background-color: #222;
+  text-align: center;
 }
 
 
@@ -50,4 +51,8 @@ button, input[type="submit"], input[type="reset"] {
 }
 
 
-
+#alert_text {
+  color: white;
+  font-size: 1em;
+  opacity: 0;
+}

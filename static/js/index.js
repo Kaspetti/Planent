@@ -1,15 +1,28 @@
-const colorBins = 20
+const colorBins = 10
 const color = d3.scaleSequential([0, colorBins], d3.interpolateBlues);
 
 let answerName
 let colorIndices = {}
+let activeGame = false
+
+let alertText = document.getElementById("alert_text")
 
 function guessCountry(event) {
   if (event.keyCode !== 13) {
     return
   }
 
+  if (!activeGame) {
+    alertText.style.opacity = 1
+    alertText.innerText = "Game is not active, start a new game using by pressing 'New Game'"
+  }
+
   const country = document.getElementById("input")
+
+  if (country.value === "") {
+    return
+  }
+
   const countryObject = d3.select(`#map svg g .unit-${country.value}`)
 
   if (!countryObject.empty()) {
@@ -22,7 +35,8 @@ function guessCountry(event) {
     }
 
   } else {
-    console.log(`no country with code ${country.value}`)
+    alertText.style.opacity = 1
+    alertText.innerText = `No country/area with called ${country.value}`
   }
 
   country.value = ""
@@ -62,10 +76,17 @@ function initGame() {
   let button = document.getElementById("new_game")
   button.innerText = "Show Answer"
   button.onclick = showAnswer
+
+  alertText.style.opacity = 0
+  activeGame = true
 }
 
 
 function showAnswer() { 
+  activeGame = false
+  alertText.style.opacity = 1
+  alertText.innerText = `The answer was ${answerName}`
+
   const countries = d3.selectAll("#map svg g .unit")
   countries.each(function(d) {
     const country = d3.select(this)
