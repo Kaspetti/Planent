@@ -1,3 +1,29 @@
 body {
   background-color: #222;
 }
+
+
+#input_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1em;
+}
+
+
+#input {
+  background-color: #444;
+  border: solid 1px #666;
+  width: 20em;
+  height: 3em;
+  color: white;
+  font-size: 100%;
+  margin-right: 1em;
+}
+
+
+#color_tooltip {
+  width: 3em;
+  height: 3em;
+  background-color: blue;
+}

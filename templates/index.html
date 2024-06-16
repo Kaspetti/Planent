@@ -6,7 +6,10 @@
     <link href="/static/css/index.css" rel="stylesheet">
   </head>
   <body>
-    <input type="text" id="input" onkeypress="guessCountry(event)"/>
+    <div id="input_container">
+      <input type="text" id="input" onkeypress="guessCountry(event)"/>
+      <div id="color_tooltip"></div>
+    </div>
     <div class="d3-geomap" id="map"></div>
   </body>
   <script src="//unpkg.com/d3@5/dist/d3.min.js"></script>
