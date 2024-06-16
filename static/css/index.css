@@ -42,7 +42,7 @@ button, input[type="submit"], input[type="reset"] {
 
 #new_game {
   height: 3em;
-  width: auto;
+  width: 8em;
   background-color: #444;
   padding: 1em;
   color: white;

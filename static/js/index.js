@@ -1,9 +1,7 @@
 const colorBins = 20
 const color = d3.scaleSequential([0, colorBins], d3.interpolateBlues);
-let answer
 
-let activeGame = false
-
+let answerName
 let colorIndices = {}
 
 function guessCountry(event) {
@@ -11,40 +9,33 @@ function guessCountry(event) {
     return
   }
 
-  // initGame()
-  // console.log(answer.datum().properties.name)
-  //
-  // const countries = d3.selectAll("#map svg g .unit")
-  // countries.each(function(d) {
-  //   const country = d3.select(this)
-  //
-  //   if (country.datum().properties.name === answer.datum().properties.name) {
-  //     country.style("fill", "green")
-  //   } else {
-  //     country.style("fill", color(colorIndices[d.properties.name]))
-  //   }
-  // })
+  const country = document.getElementById("input")
+  const countryObject = d3.select(`#map svg g .unit-${country.value}`)
 
-  // const country = document.getElementById("input")
-  // const countryTopology = d3.select(`#map svg g .unit-${country.value}`)
-  //
-  //
-  // if (!countryTopology.empty()) {
-  //   countryTopology.style("fill", color(Math.random() * 100))
-  // } else {
-  //   console.log(`no country with code ${country.value}`)
-  // }
-  //
-  // country.value = ""
+  if (!countryObject.empty()) {
+    if (countryObject.datum().properties.name === answerName) {
+      countryObject.style("fill", "green")
+    } else {
+      const c = color(colorIndices[countryObject.datum().properties.name])
+      countryObject.style("fill", c)
+      document.getElementById("color_tooltip").style.backgroundColor = c
+    }
+
+  } else {
+    console.log(`no country with code ${country.value}`)
+  }
+
+  country.value = ""
 }
 
 
-
 function initGame() {
+  colorIndices = {}
   const countries = d3.selectAll("#map svg g .unit")
   let node = countries.nodes()[Math.floor(Math.random() * countries.nodes().length)]
 
-  answer = d3.select(node)
+  let answer = d3.select(node)
+  answerName = answer.datum().properties.name
   const answerCenter = d3.geoCentroid(answer.datum())
 
   let distances = {}
@@ -55,6 +46,8 @@ function initGame() {
       const distSqrd = Math.pow(answerCenter[0] - countryCentroid[0], 2) + Math.pow(answerCenter[1] - countryCentroid[1], 2)
       distances[d.properties.name] = Math.sqrt(distSqrd)
     }
+
+    d3.select(this).style("fill", "#ccc")
   })
 
   const [minDistance, maxDistance] = Object.entries(distances).reduce(
@@ -65,7 +58,30 @@ function initGame() {
   for (const [key, value] of Object.entries(distances)) {
     colorIndices[key] = Math.round(colorBins - ((value - minDistance) / (maxDistance - minDistance)) * colorBins)
   }
+
+  let button = document.getElementById("new_game")
+  button.innerText = "Show Answer"
+  button.onclick = showAnswer
 }
+
+
+function showAnswer() { 
+  const countries = d3.selectAll("#map svg g .unit")
+  countries.each(function(d) {
+    const country = d3.select(this)
+    if (d.properties.name === answerName) {
+      country.style("fill", "green")  
+    } else {
+      const c = color(colorIndices[d.properties.name])
+      country.style("fill", c)
+    }
+  })
+
+  let button = document.getElementById("new_game")
+  button.innerText = "New Game"
+  button.onclick = initGame
+}
+
 
 function initMap() {
   let map = d3.geomap()
