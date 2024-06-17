@@ -37,7 +37,7 @@ button, input[type="submit"], input[type="reset"] {
 #color_tooltip {
   width: 3em;
   height: 3em;
-  background-color: blue;
+  background-color: #ccc;
 }
 
 
