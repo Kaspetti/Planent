@@ -6,6 +6,8 @@ let answerName
 let colorIndices = {}
 let activeGame = false
 
+let distances = {}
+
 let alertText = document.getElementById("alert_text")
 
 let testAnswer
@@ -55,32 +57,39 @@ function initGame() {
 
   let answer = d3.select(node)
   answerName = answer.datum().properties.name
-  const answerCenter = d3.geoCentroid(answer.datum())
+  // const answerCenter = d3.geoCentroid(answer.datum())
 
-  let distances = {}
+  // let distances = {}
   countries.each(function(d) {
-    if (d.properties.name !== answer.datum().properties.name) {
-      const countryCentroid = d3.geoCentroid(d)
-      let distSqrd
-
-      if (distanceMeasure === "centroid") {
-        distSqrd = Math.pow(answerCenter[0] - countryCentroid[0], 2) + Math.pow(answerCenter[1] - countryCentroid[1], 2)
-      } else {
-        distSqrd = calculateDistance(answer.datum(), d)
-      }
-      distances[d.properties.name] = Math.sqrt(distSqrd)
-    }
+    // if (d.properties.name !== answer.datum().properties.name) {
+    //   const countryCentroid = d3.geoCentroid(d)
+    //   let distSqrd
+    //
+    //   if (distanceMeasure === "centroid") {
+    //     distSqrd = Math.pow(answerCenter[0] - countryCentroid[0], 2) + Math.pow(answerCenter[1] - countryCentroid[1], 2)
+    //   } else {
+    //     distSqrd = calculateDistance(answer.datum(), d)
+    //   }
+    //   distances[d.properties.name] = Math.sqrt(distSqrd)
+    // }
 
     d3.select(this).style("fill", "#ccc")
   })
 
-  const [minDistance, maxDistance] = Object.entries(distances).reduce(
-    ([min, max], [_, value]) => [Math.min(min, value), Math.max(max, value)],
-    [Infinity, -Infinity]
-  );
+  // const [minDistance, maxDistance] = Object.entries(distances[answerName]).reduce(
+  //   ([min, max], [_, value]) => [Math.min(min, value), Math.max(max, value)],
+  //   [Infinity, -Infinity]
+  // );
 
-  for (const [key, value] of Object.entries(distances)) {
-    colorIndices[key] = Math.round(colorBins - ((value - minDistance) / (maxDistance - minDistance)) * colorBins)
+  const dists = Object.values(distances[answerName])
+  const powBase = 0.3
+  const powDists = dists.map(d => Math.pow(d, powBase))
+  const minDistance = Math.min(...powDists) 
+  const maxDistance = Math.max(...powDists)
+
+  for (const [key, value] of Object.entries(distances[answerName])) {
+    const powDist = Math.pow(value, powBase)
+    colorIndices[key] = Math.round(colorBins - ((powDist - minDistance) / (maxDistance - minDistance)) * colorBins)
   }
 
   let button = document.getElementById("new_game")
@@ -139,7 +148,7 @@ function calculateDistance(d1, d2) {
 }
 
 
-function initMap() {
+async function initMap() {
   let map = d3.geomap()
     .geofile("/static/data/topojson.json")
     .units("countries")
@@ -147,6 +156,8 @@ function initMap() {
     .unitTitle("")
 
   map.draw(d3.select('#map'))
+
+  distances = await d3.json("/static/data/distances.json")  
 
   // d3.csv("/static/data/all.csv", function(data) {
   //   console.log(data)
