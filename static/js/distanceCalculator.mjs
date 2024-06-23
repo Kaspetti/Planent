@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import * as topojson from "topojson-client"
 
-fs.readFile('./static/data/topojson.json', 'utf8', (err, data) => {
+fs.readFile('./static/data/map.topojson', 'utf8', (err, data) => {
   if (err) {
     console.error('Error reading the file:', err);
     return;
@@ -11,10 +11,9 @@ fs.readFile('./static/data/topojson.json', 'utf8', (err, data) => {
 
   try {
     const topology = JSON.parse(data);
-    const geoJson = topojson.feature(topology, topology.objects.countries);
-    
+    const geoJson = topojson.feature(topology, topology.objects.collection);
+  
     geoJson.features.forEach(function(c1) {
-      // console.log(`Calculating distances for ${c1.properties.name}`)
       distances[c1.properties.name] = {}
       geoJson.features.forEach(function(c2) {
         if (c1 !== c2) {

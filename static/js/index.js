@@ -2,7 +2,7 @@
 // and the distance measure to use ("centroid", "")
 const colorBins = 10
 const color = d3.scaleSequential([0, colorBins], d3.interpolateBlues);
-const distanceMeasure = "centroid"
+const distanceMeasure = "closest"
 
 let answerName
 let colorIndices = {}   // The color indices for the countries. Will be in the range 0-colorBins
@@ -91,6 +91,10 @@ function initGame() {
     const maxDistance = Math.max(...powDists)
 
     for (const [key, value] of Object.entries(distances[answerName])) {
+      if (key === "russia") {
+        console.log(distances[answerName])
+      }
+
       const powDist = Math.pow(value, powBase)
       colorIndices[key] = Math.round(colorBins - ((powDist - minDistance) / (maxDistance - minDistance)) * colorBins)
     }
@@ -135,8 +139,9 @@ function showAnswer() {
 // Import the precalculated distances
 async function initMap() {
   let map = d3.geomap()
-    .geofile("/static/data/topojson.json")
-    .units("countries")
+    // .geofile("/static/data/topojson.json")
+    .geofile("/static/data/map.topojson")
+    .units("collection")
     .unitId("name")
     .unitTitle("")
 
