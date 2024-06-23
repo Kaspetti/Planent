@@ -64,16 +64,38 @@ function initGame() {
     d3.select(this).style("fill", "#ccc")
   })
 
-  const dists = Object.values(distances[answerName])
-  const powBase = 0.3   // Change this for different gradient. Default distances without power looks strange
-  const powDists = dists.map(d => Math.pow(d, powBase))
-  const minDistance = Math.min(...powDists) 
-  const maxDistance = Math.max(...powDists)
+  if (distanceMeasure === "centroid") {
+    let dists = {}
+    const countries = d3.selectAll("#map svg g .unit")
+    countries.each(function(d) {
+      const c1 = d3.geoCentroid(answer.datum())
+      const c2 = d3.geoCentroid(d)
 
-  for (const [key, value] of Object.entries(distances[answerName])) {
-    const powDist = Math.pow(value, powBase)
-    colorIndices[key] = Math.round(colorBins - ((powDist - minDistance) / (maxDistance - minDistance)) * colorBins)
+      dists[d.properties.name] = Math.sqrt(Math.pow(c1[0] - c2[0], 2) + Math.pow(c1[1] - c2[1], 2))
+
+    })
+    const minDistance = Math.min(...Object.values(dists))
+    const maxDistance = Math.max(...Object.values(dists))
+
+    for (const [key, value] of Object.entries(dists)) {
+      colorIndices[key] = Math.round(colorBins - ((value - minDistance) / (maxDistance - minDistance)) * colorBins)
+    }
+  } else {
+    if (distanceMeasure !== "closest") {
+      console.warn(`Invalid distance measure: '${distanceMeasure}'. Valid are: 'centroid' and 'closest'. Defaults to 'closest'.`)
+    }
+    const dists = Object.values(distances[answerName])
+    const powBase = 0.3   // Change this for different gradient. Default distances without power looks strange
+    const powDists = dists.map(d => Math.pow(d, powBase))
+    const minDistance = Math.min(...powDists) 
+    const maxDistance = Math.max(...powDists)
+
+    for (const [key, value] of Object.entries(distances[answerName])) {
+      const powDist = Math.pow(value, powBase)
+      colorIndices[key] = Math.round(colorBins - ((powDist - minDistance) / (maxDistance - minDistance)) * colorBins)
+    }
   }
+
 
   let button = document.getElementById("new_game")
   button.innerText = "Show Answer"
