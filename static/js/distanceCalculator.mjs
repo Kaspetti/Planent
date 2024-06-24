@@ -12,10 +12,13 @@ fs.readFile('./static/data/map.topojson', 'utf8', (err, data) => {
   try {
     const topology = JSON.parse(data);
     const geoJson = topojson.feature(topology, topology.objects.collection);
-  
+
     geoJson.features.forEach(function(c1) {
       distances[c1.properties.name] = {}
       geoJson.features.forEach(function(c2) {
+        if (c2.properties.name === "spain") {
+          console.log(c2.geometry.coordinates)
+        }
         if (c1 !== c2) {
           distances[c1.properties.name][c2.properties.name] = calculateDistance(c1, c2)
         }

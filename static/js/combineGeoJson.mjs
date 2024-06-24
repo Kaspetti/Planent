@@ -41,6 +41,7 @@ countries.slice().forEach(function(c) {
 
         gjs.features.forEach(function(f) {
           f.geometry.coordinates.forEach(function(c) {
+            c = c.map(d => [(d[0] + 180) % 360 - 180, (d[1] + 90) % 180 - 90])
             if (isClockwise(c)) {
               feature.geometry.coordinates.push(c)
             } else {
@@ -68,6 +69,7 @@ countries.slice().forEach(function(c) {
 
     gjs.features.forEach(function(f) {
       f.geometry.coordinates.forEach(function(c) {
+        c = c.map(d => [(d[0] + 180) % 360 - 180, (d[1] + 90) % 180 - 90])
         if (isClockwise(c)) {
           feature.geometry.coordinates.push(c)
         } else {
